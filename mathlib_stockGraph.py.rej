@@ -1,0 +1,9 @@
+diff a/mathlib_stockGraph.py b/mathlib_stockGraph.py	(rejected hunks)
+@@ -63,6 +63,7 @@
+             if 'timestamp' not in each_line:
+                 stock_data.append(each_line)
+ 
++                    
+     #Transferindo os dados para as variáveis
+                 #date       > data específica
+                 #openp   > valor das ações ao abrir o dia
