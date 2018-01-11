@@ -10,8 +10,11 @@ def bdate2num(fmt, encoding='utf-8'):
         s = b.decode(encoding)
         return str_converter(s)
     return bconverter
-
+    
+    
 def getFunction(fun):
+    outputsize= ''
+    interval= ''
     if(fun==1):
         print('Function: Intraday') 
         fun = 'TIME_SERIES_INTRADAY'        #REQ - value for query
@@ -19,19 +22,27 @@ def getFunction(fun):
         ##Interval
         print('-----------------------------------------------------')
         interval = input('Interval (1, 5, 15, 30, 60 min): ') #REQ (time)
-        ##Outputsize (OPT)
+        ##Outputsize (OPT, only daily)
         print('-----------------------------------------------------')
-        outputsize = input('Outputsize - compact/full (default:compact): ')
+        outputsize = input('Outputsize - compact/full (default:compact): ') #OPT
         print('-----------------------------------------------------')
         
     elif(fun==2):
         print('Function: Daily')
         fun = 'TIME_SERIES_DAILY'
         stock = input('Stock: ')
+        ##Outputsize (OPT, only daily)
+        print('-----------------------------------------------------')
+        outputsize = input('Outputsize - compact/full (default:compact): ') #OPT
+        print('-----------------------------------------------------')
     elif(fun==3):
         print('Function: Daily Adjusted')
         fun = 'TIME_SERIES_DAILY_ADJUSTED'
         stock = input('Stock: ')
+        ##Outputsize (OPT, only daily)
+        print('-----------------------------------------------------')
+        outputsize = input('Outputsize - compact/full (default:compact): ') #OPT
+        print('-----------------------------------------------------')
     elif(fun==4):
         print('Function: Weekly')
         fun ='TIME_SERIES_WEEKLY'
@@ -59,10 +70,10 @@ def getFunction(fun):
             a.append(line)
             line = input(prompt)
         stock = ','.join(str(e) for e in a)
-
+    
     print(stock)
     print('-----------------------------------------------------')
-    return fun, stock, interval
+    return fun, stock, interval, outputsize
 
 def graph_data ():
     
@@ -75,93 +86,66 @@ def graph_data ():
     print('5) Weekly Adjusted (Not Implemented)\n6) Monthly\n7) Monthly Adjusted (Not Implemented)\n8) Batch Stock Quotes')
     
     ##Get function
-    fun = True
-    while (fun == True):
-        fun = input('\nSelect the function: ')
+    fun = False
+    while (fun == False):
+        print('-----------------------------------------------------')
+        fun = input('Select the function: ')
         fun = int(fun)
-        print (type(fun))
         if (fun == 3):
-            print(fun ,' isn\'t a valid operation (yet)')
-            fun=True
+            print('Function: ', fun ,' isn\'t a valid operation (yet)')
+            fun=False
         elif(fun ==5):
-            print(fun , ' isn\'t a valid operation (yet)')
-            fun=True
+            print('Function: ',fun , ' isn\'t a valid operation (yet)')
+            fun=False
         elif(fun==7):
-            print(fun ,' isn\'t a valid operation (yet)')
-            fun=True
+            print('Function: ',fun ,' isn\'t a valid operation (yet)')
+            fun=False
         
-    fun, stock, interval = getFunction(fun)
-    print(fun, '>>>', stock)
+    aux, stock, inter, output = getFunction(fun)
+        
+    print(aux, '>>>', stock)
     
     ##Function (REQ)
-    function = '&function='+fun
+    function = 'function='+aux
     print(function)
     
     ##Symbol (REQ)
-    symbol = '&symbol='+stock
+    if(fun==8):
+        symbol = '&symbols='+stock
+    else:
+        symbol  = '&symbol='+stock
     print(symbol)
 
     ##Interval - Only INTRADAY (REQ)
-    interval = '&interval='+inter
+    print(inter)
+    print(output)
+    if(inter!=''):
+        print('Entrou no inter ===')
+        interval = '&interval='+inter+'min'
+        print(interval)
+    else:
+        interval=''
+
+    ##Outputsize
+    if(output!=''):
+        print('Entrou no inter ===')
+        outputsize = '&outputsize='+output
+        print(outputsize)
+    else:
+        outputsize=''
+    print('-----------------------------------------------------')
     
-        #Datatype - CSV or Json (not used)
-    datatype = '&datatype='+data
-        #API Key (REQ)
+    ##Datatype - CSV or Json (not used)
+    datatype = '&datatype=json'
+    ##API Key (REQ)
     api = 'XDESS96825BHFYQE'
-
-    
-    #Intraday
-    #Daily
-    #Daily Adjusted
-    #Weekly
-    #Weekly Adjusted
-    #Monthly
-    #Monthly Adjusted
-    #Batch Stock Quotes
-
-    #Configuração do gráfico em Grid
-    fig = plt.figure()
-    ax1 = plt.subplot2grid((1,1), (0,0))
-
-    #Exibir informações
-    print('Currently pulling: ', stock)   
-    url = base+function+symbol+size+'&outputsize=full&apikey='+api+'&datatype=csv'
-    print('URL: '+ url + '\n>> Decodificando URL')
-    
-    #URL Decode - decodificando o URL
-    source_code = urllib.request.urlopen(url).read().decode()
-    stock_data = [] #Array DATA
-    split_source = source_code.split('\n') #Dividir as linhas do API
-
-    #Recuperar as informações do arquivo CSV
-    for each_line in split_source:
-        split_line = each_line.split(',')
-        if len(split_line) == 6:
-            if 'timestamp' not in each_line:
-                stock_data.append(each_line)
-             
-    #Transferindo os dados para as variáveis
-                #date       > data específica
-                #openp   > valor das ações ao abrir o dia
-                #highp    > maior valor que as ações atingiu no dia
-                #lowp      > menor valor que as ações atingiu no dia
-                #closep  > valor que as ações fecharam
-                #volume > a quantidade de ações movimentadas
-
-    if(temp != '1'):
-        date, openp, highp, lowp, closep, volume = np.loadtxt(stock_data, delimiter= ',', unpack=True,
-                                                              converters={0:bdate2num('%Y-%m-%d')})
-    elif(temp=='1'):
-        date, openp, highp, lowp, closep, volume = np.loadtxt(stock_data, delimiter= ',', unpack=True,
-                                                              converters={0:bdate2num('%Y-%m-%d %H:%M:%S')})
-    plt.plot_date(date, closep, '-')
-    for label in ax1.xaxis.get_ticklabels():
-        label.set_rotation(45)
-        
-    ax1.grid(True) #, color='g', linestyle='-', linewidth=3)
-    plt.subplots_adjust(left = .15, bottom = .15, right = .95, top = .95, wspace = .2, hspace = .2)
-    plt.show()
+    api_key = '&apikey='+api
+    url = base + function + symbol + interval+ outputsize + api_key + datatype
+    print(url)
+    print('>>>>>>>>>>>>>>>FIM<<<<<<<<<<<<<<<')
+    print('>>>>>>>>>>>>>>>FIM<<<<<<<<<<<<<<<\n')
 
 
+#Main code
 while(True):
     graph_data()
