@@ -77,27 +77,11 @@ def graph_data (stock, api):
     elif(temp=='1'):
         date, openp, highp, lowp, closep, volume = np.loadtxt(stock_data, delimiter= ',', unpack=True,
                                                               converters={0:bdate2num('%Y-%m-%d %H:%M:%S')})
-        
-    ax1.plot_date(date, closep, '-')
-    ax1.fill_between(date, closep, 200, where=(closep >=200), facecolor='g', alpha = .5)
-    ax1.fill_between(date, closep, 55, where=(closep <=55), facecolor='r', alpha = .5)
-    ax1.axhline(200, color='r')
-    ax1.axhline(55, color='r')
+    plt.plot_date(date, closep, '-')
     for label in ax1.xaxis.get_ticklabels():
         label.set_rotation(45)
-    
+        
     ax1.grid(True) #, color='g', linestyle='-', linewidth=3)
-    #color
-    ax1.yaxis.label.set_color('m')
-    ax1.xaxis.label.set_color('g')
-    ax1.spines['left'].set_color('c')
-    ax1.spines['left'].set_linewidth(2)
-    ax1.spines['bottom'].set_color('c')
-    ax1.spines['bottom'].set_linewidth(2)
-
-    ax1.spines['top'].set_visible(False)
-    ax1.spines['right'].set_visible(False)
-
     plt.subplots_adjust(left = .15, bottom = .15, right = .95, top = .95, wspace = .2, hspace = .2)
     plt.show()
 
