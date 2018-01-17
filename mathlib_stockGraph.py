@@ -4,6 +4,10 @@ import urllib
 import numpy as np
 import datetime as dt
 
+
+from matplotlib import style
+
+
 def bdate2num(fmt, encoding='utf-8'):
     str_converter = mdates.strpdate2num(fmt)
     def bconverter(b):
@@ -12,7 +16,10 @@ def bdate2num(fmt, encoding='utf-8'):
     return bconverter
 
 def graph_data (stock, api):
-
+    
+    print(plt.style.available)
+    estilo = input('Select the style: ')
+    style.use(estilo)
     #Informações basicas
     base = 'https://www.alphavantage.co/query?' #Base da Query
 
@@ -87,5 +94,6 @@ def graph_data (stock, api):
 
 api = 'XDESS96825BHFYQE'
 while(True):
+    
     stock = input('Stock to plot: ')
     graph_data(stock,api)
